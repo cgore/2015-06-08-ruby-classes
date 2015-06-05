@@ -1,0 +1,16 @@
+# Ignore emacs swap and temp files.
+\#*\#
+.#*
+
+# Ignore vim swap and temp files.
+*~
+*.sw[nop]
+
+# Ignore SBCL compiled code.
+*.fasl
+
+# Some of the LaTeX stuff.
+slides/slides.aux
+slides/slides.log
+slides/missfont.log
+

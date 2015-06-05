@@ -1,0 +1,156 @@
+% Copyright (c) 2015, Christopher Mark Gore,
+% Soli Deo Gloria,
+% All rights reserved.
+%
+% 2317 South River Road, Saint Charles, Missouri 63303 USA.
+% Web: http://cgore.com
+% Email: cgore@cgore.com
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%
+%     * Neither the name of Christopher Mark Gore nor the names of other
+%       contributors may be used to endorse or promote products derived from
+%       this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+% AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+% IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+% ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+% LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+% CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+% SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+% INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+% CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+% ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+% POSSIBILITY OF SUCH DAMAGE.
+
+\documentclass{seminar}
+
+\usepackage{fixltx2e} % Bugfixes for LaTeX 2e
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[normalem]{ulem}
+\usepackage{graphicx}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{librebaskerville} % Baskerville font
+\usepackage{amsfonts}
+\usepackage{listings}
+\usepackage[dvips]{pstricks}
+\usepackage{relsize}
+\usepackage{textcomp}
+\usepackage[normalem]{ulem}
+\usepackage{wasysym}
+\usepackage{dirtree}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{pifont}
+
+\usepackage{semcolor,slidesec}
+\input{seminar.bug}
+\input{seminar.bg2}
+% \input{seminar.bg3} % TODO: why is this missing on OSX?
+
+\definecolor{fillcolor}{rgb}{0.9,0.95,1.0}
+\definecolor{linecolor}{rgb}{0.8,0.85,0.9}
+\slideframe[\psset{fillcolor=fillcolor,linecolor=linecolor}]{scshadow}
+
+\newcommand{\hc}{Blue}
+\newcommand{\h}[1]{\slideheading{\textcolor{\hc}{#1}}}
+\newcommand{\tq}[1]{\textcolor{Green}{\textbf{#1}}}
+\newcommand{\tbd}[1]{\textcolor{Blue}{\textit{#1}}}
+\newcommand{\TODO}{{\Huge \textcolor{Red}{\textbf{{TO DO}}}}}
+
+\definecolor{commentcolor}{rgb}{0.1,0.1,0.8}
+\definecolor{identifiercolor}{rgb}{0.2,0.2,0.2}
+\definecolor{keywordcolor}{rgb}{0.1,0.3,0.1}
+\definecolor{cexcolor}{rgb}{0.25,0.25,0.4}
+\lstset{
+  basicstyle=\footnotesize\ttfamily,
+  language=Ruby,
+  morekeywords={make-instance},
+  escapeinside={\%*}{*)},
+  commentstyle=\itshape\color{commentcolor},
+  identifierstyle=\color{identifiercolor},
+  keywordstyle=\color{keywordcolor},
+  upquote=true,
+  numbers=left,
+  numberstyle=\tiny\color{commentcolor},
+  numbersep=5pt
+}
+\newcommand{\cex}[1]{\textcolor{cexcolor}{\textit{#1}}}
+
+\newcommand{\shell}[1]{\texttt{\textbf{{\textcolor{Blue} \$}} #1}}
+
+\newcommand{\xmark}{\textcolor{Red}{\ding{55}}}
+\newcommand{\cmark}{\textcolor{Green}{\ding{51}}}
+
+\newcommand{\SlideSection}[1]
+{
+  \begin{center}
+    \textcolor{\hc}{\textbf{\emph{\Huge{#1}}}}
+  \end{center}
+}
+
+
+\newcommand{\fullSlideImage}[1]{
+  \begin{center}
+    \includegraphics[width=4in,height=2.5in,keepaspectratio=true]{#1}
+  \end{center}
+}
+
+\newcommand{\halfSlideImage}[1]{
+  \includegraphics[width=2in,height=2.5in,keepaspectratio=true]{#1}
+}
+
+\newcommand{\rightSideImageName}{you-must-supply-the-image-name.eps}
+\newenvironment{rightSideImage}[1]
+{
+  \renewcommand{\rightSideImageName}{#1}
+  \begin{tabular}{lr}
+    \begin{minipage}[b]{2in}
+}
+{
+    \end{minipage}
+    &
+    \halfSlideImage{\rightSideImageName}
+  \end{tabular}
+}
+
+\title{\psshadowbox{Eigenclasses, Singletons, What?}}
+\author{Christopher Mark Gore\\
+  \texttt{cgore.com}}
+\date{Monday, June 8, {\smaller AD} 2015} % textsc doesn't seem to work for Baskerville.
+
+\begin{document}
+
+\raggedslides[0mm]
+
+
+\begin{slide}
+  \color{\hc}
+
+  \begin{center}
+    \includegraphics[height=1.25in]{stlruby.eps}
+  \end{center}
+
+  \maketitle
+
+  \color{Black}
+\end{slide}
+
+
+\begin{slide}
+  \SlideSection{Questions?}
+\end{slide}
+
+
+\end{document}
