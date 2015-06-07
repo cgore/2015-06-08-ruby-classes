@@ -53,6 +53,9 @@
 \usepackage{float}
 \usepackage{wrapfig}
 \usepackage{pifont}
+\usepackage{tikz}
+
+\usetikzlibrary{positioning,shapes,shadows,arrows}
 
 \usepackage{semcolor,slidesec}
 \input{seminar.bug}
@@ -70,8 +73,8 @@
 \newcommand{\TODO}{{\Huge \textcolor{Red}{\textbf{{TO DO}}}}}
 
 \definecolor{commentcolor}{rgb}{0.1,0.1,0.8}
-\definecolor{identifiercolor}{rgb}{0.2,0.2,0.2}
-\definecolor{keywordcolor}{rgb}{0.1,0.3,0.1}
+\definecolor{identifiercolor}{rgb}{0.3,0.3,0.3}
+\definecolor{keywordcolor}{rgb}{0.1,0.5,0.1}
 \definecolor{cexcolor}{rgb}{0.25,0.25,0.4}
 \lstset{
   basicstyle=\footnotesize\ttfamily,
@@ -149,8 +152,271 @@
 
 
 \begin{slide}
-  \SlideSection{Questions?}
+  \h{Everything is a Thing}
+
+\begin{lstlisting}
+12.class # Fixnum
+"Hi there".class # String
+2.71828.class # Float
+[1, 2, 3].class # Array
+{age: 36, name: "Chris"}.class # Hash
+:foo.class # Symbol
+\end{lstlisting}
 \end{slide}
 
 
+\begin{slide}
+  \h{We Can Insist on the ``Right'' Thing}
+
+  We'll explain the difference between the concepts ``instance of,'' ``is a,''  and ``kind
+  of'' in a few slides.
+
+\begin{lstlisting}
+if not k.class == Fixnum
+  raise ILoveOnlyNumbers
+end
+if not m.instance_of? Fixnum
+  raise ILoveOnlyNumbers
+end
+if not n.is_a? Fixnum
+  raise ILoveOnlyNumbers
+end
+if not o.kind_of? Fixnum
+  raise ILoveOnlyNumbers
+end
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{We Can Do Different Things\\to Different Things}
+
+\begin{lstlisting}
+if n.class == Fixnum
+  puts "Whole Numbers FTW!!!"
+elsif n.class == Float
+  puts "More Accuracy is MORE!!!"
+else
+  raise ILoveOnlyNumbers
+end
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Even Classes are Things!}
+
+  This is one of the more unique aspects of Ruby.
+  In a lot of other object-oriented programming languages, classes are
+  ``special'' somehow, and you can't treat them the same way as everything else.
+
+\begin{lstlisting}
+:foo.class # Symbol
+:foo.class.class # Class
+:foo.class.class.class # Class
+\end{lstlisting}
+
+  We'll see how that's actually really nice and useful in a bit.
+\end{slide}
+
+
+\begin{slide}
+  \h{We Can Make Our Own Classes}
+
+\begin{lstlisting}
+class Cat
+  def initialize color
+    @color = color
+    @lives = 9
+  end
+  def die
+    @lives = @lives - 1
+  end
+  def alive?
+    @lives >= 1
+  end
+  def eat_tuna
+    puts "Purrr!"
+  end
+end
+lucky = Cat.new "black"
+lucky.alive? # true
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Classes Have Methods}
+
+  And those methods let our class instances do things.
+
+\begin{lstlisting}
+class ATM
+  def initialize amount
+    @amount = amount
+  end
+  def deposit account, amount
+    @amount = @amount + amount
+    account.deposit amount
+  end
+  def withdraw accout, amount
+    raise GoAwayPeasant if amount > account.amount
+    raise RunOnTheBank if amount > @amount
+    account.withdraw amount
+    @amount = @amount - amount
+  end
+end
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Instance Variables}
+
+  Instance variables are written with an at-sign like \texttt{@foo}, and are
+  per-instance.
+
+\begin{lstlisting}
+class Person
+  attr_reader :age, name
+  def initialize(age, name)
+    @age = age
+    @name = name
+  end
+end
+john = Person.new 12, "John Jacobson"
+fred = Person.new 44, "Fred Fellows"
+john.age # 12
+fred.age # 44
+john == fred # false
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Getters and Setters}
+
+\begin{lstlisting}
+class Car
+  attr_accessor :color
+  attr_reader :mileage
+  def initialize(color, mileage)
+    @color, @mileage = color, mileage
+  end
+  def drive miles
+    @mileage = @mileage + miles
+  end
+end
+c = Car.new 4, :blue
+c.drive 92_000
+c.mileage # 92004
+c.color = :green
+c.mileage = 123 # NoMethodError: undefined method `mileage='
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Class Variables}
+
+  Class variables are written with two at-signs like \texttt{@@foo}, and are
+  per-class.  They are almost never what you actually want.
+
+\begin{lstlisting}
+class People
+  @@population = 0
+  attr_reader :name, :age
+  def initialize(name, age)
+    @@population = @@population + 1
+    @alive = true
+    @name, @age = name, age
+  end
+  def die
+    @alive = false
+    @@population = @@population - 1
+  end
+end
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Class Methods}
+
+\begin{lstlisting}
+class Person
+  attr_reader :name, :born, :died
+  def initialize(name, born, died)
+    @name, @born, @died = name, born, died
+  end
+  class << self
+    def from_s s # String like "John Doe (1912 - 1990)"
+      name, born, died = s.scan(/(.*)\((\d+) - (\d+)\)/)[0]
+      Person.new name, born.to_i, died.to_i
+    end
+  end
+end
+george = Person.from_s "George Washington (1732 - 1739)"
+ben = Person.from_s "Benjamin Franklin (1706 - 1790)"
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Inheritance}
+
+\begin{tikzpicture}
+  \node[draw, fill=white] (Pet) at (0,2) {Pet};
+  \node[draw, fill=white] (Cat) at (-1,1) {Cat};
+  \node[draw, fill=white] (Dog) at (1,1) {Dog};
+  \node[draw, fill=white] (Lab) at (1,0) {Lab};
+  \draw[-open triangle 60, thick] (Cat) to (Pet);
+  \draw[-open triangle 60, thick] (Dog) to (Pet);
+  \draw[-open triangle 60, thick] (Lab) to (Dog);
+\end{tikzpicture}
+
+\begin{lstlisting}
+class Pet
+end
+class Cat < Pet
+end
+class Dog < Pet
+end
+class Lab < Dog
+end
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{``Kind Of'' versus ``Instance Of''}
+\end{slide}
+
+
+\begin{slide}
+  \h{Class Instance Variables}
+
+\begin{lstlisting}
+class Foo
+  @bar = 0
+  attr_accessor :bar
+  def initialize(bar)
+    @bar = bar
+  end
+  class << self
+    
+  end
+end
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Mixins}
+\end{slide}
+
+
+\begin{slide}
+  \SlideSection{Questions?}
+\end{slide}
 \end{document}
