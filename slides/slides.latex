@@ -317,6 +317,13 @@ john == fred # false
 \begin{slide}
   \h{Getters and Setters}
 
+  \fullSlideImage{gimme.eps}
+\end{slide}
+
+
+\begin{slide}
+  \h{Getters and Setters}
+
 \begin{lstlisting}
 class Car
   attr_accessor :color
@@ -380,6 +387,13 @@ end
 george = Person.from_s "George Washington (1732 - 1739)"
 ben = Person.from_s "Benjamin Franklin (1706 - 1790)"
 \end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Inheritance}
+
+  \fullSlideImage{inheritance.eps}
 \end{slide}
 
 
@@ -555,6 +569,13 @@ m = MathStuff.new # NoMethodError: undefined method `new'
 
 
 \begin{slide}
+  \h{Mixins}
+
+  \fullSlideImage{mixin.eps}
+\end{slide}
+
+
+\begin{slide}
   \h{Mixins Are Modules Stuffed Into Classes}
 
   \begin{tikzpicture}
@@ -586,6 +607,13 @@ class Customer
   include Person
 end
 \end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Singletons}
+
+  \fullSlideImage{lonely.eps}
 \end{slide}
 
 
@@ -680,6 +708,28 @@ end
 c.to_s # "lucky"
 d.to_s # "13"
 metaclass = class << c; self; end
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Eigenclasses versus Metaclasses}
+
+  Eigenclasses are sort of the metaclasses of classes.
+
+\begin{lstlisting}
+class Object
+  def eigenclass
+    class << self
+      self
+    end
+  end
+end
+
+class A
+end
+a = A.new
+metaclass = class << a; self; end
 \end{lstlisting}
 \end{slide}
 
