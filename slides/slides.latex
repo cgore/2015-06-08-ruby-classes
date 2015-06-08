@@ -159,6 +159,13 @@
 
 
 \begin{slide}
+  \h{Ruby is Weird and Awesome!}
+
+  \fullSlideImage{fanboys.eps}
+\end{slide}
+
+
+\begin{slide}
   \h{Everything is a Thing}
 
 \begin{lstlisting}
@@ -274,6 +281,13 @@ class ATM
   end
 end
 \end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Instances Can Have Their Own Stuff}
+
+  \fullSlideImage{mine.eps}
 \end{slide}
 
 
