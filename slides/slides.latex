@@ -56,6 +56,13 @@
 \usepackage{tikz}
 
 \usetikzlibrary{positioning,shapes,shadows,arrows}
+\tikzstyle{module}=[draw,fill=white]
+\tikzstyle{class}=[module, drop shadow]
+\tikzstyle{detailedClass}=[class, rectangle split, rectangle split parts=2]
+\tikzstyle{instance}=[draw,ellipse,fill=white,text=blue]
+\tikzstyle{subclass}=[-open triangle 60, thick]
+\tikzstyle{mixin}=[-open triangle 60, dashed]
+\tikzstyle{instanceOf}=[->, thick]
 
 \usepackage{semcolor,slidesec}
 \input{seminar.bug}
@@ -366,13 +373,13 @@ ben = Person.from_s "Benjamin Franklin (1706 - 1790)"
   \h{Inheritance}
 
 \begin{tikzpicture}
-  \node[draw, fill=white] (Pet) at (0,2) {Pet};
-  \node[draw, fill=white] (Cat) at (-1,1) {Cat};
-  \node[draw, fill=white] (Dog) at (1,1) {Dog};
-  \node[draw, fill=white] (Lab) at (1,0) {Lab};
-  \draw[-open triangle 60, thick] (Cat) to (Pet);
-  \draw[-open triangle 60, thick] (Dog) to (Pet);
-  \draw[-open triangle 60, thick] (Lab) to (Dog);
+  \node[class] (Pet) at (0,2) {Pet};
+  \node[class] (Cat) at (-1,1) {Cat};
+  \node[class] (Dog) at (1,1) {Dog};
+  \node[class] (Lab) at (1,0) {LabradorRetriever};
+  \draw[subclass] (Cat) to (Pet);
+  \draw[subclass] (Dog) to (Pet);
+  \draw[subclass] (Lab) to (Dog);
 \end{tikzpicture}
 
 \begin{lstlisting}
@@ -382,37 +389,284 @@ class Cat < Pet
 end
 class Dog < Pet
 end
-class Lab < Dog
+class LabradorRetriever < Dog
 end
 \end{lstlisting}
 \end{slide}
 
 
 \begin{slide}
-  \h{``Kind Of'' versus ``Instance Of''}
-\end{slide}
+  \h{Kind-Of, Is-A, and Instance-Of}
 
+  \begin{tikzpicture}
+    \node[class] (BasicObject) at (4.75,0) {BasicObject};
+    \node[class] (Object) at (2.25,0) {Object};
+    \node[class] (Numeric) at (0,0) {Numeric};
+    \node[class] (Integer) at (-1,-1) {Integer};
+    \node[class] (Fixnum) at (-2,-2) {Fixnum};
+    \node[class] (Float) at (1,-1) {Float};
 
-\begin{slide}
-  \h{Class Instance Variables}
+    \node[instance] (twelve) at (0,-2) {12};
+    \node[instance] (pi) at (3,-1) {3.14};
+
+    \draw[subclass] (Object) to (BasicObject);
+    \draw[subclass] (Numeric) to (Object);
+    \draw[subclass] (Fixnum) to (Integer);
+    \draw[subclass] (Integer) to (Numeric);
+    \draw[subclass] (Float) to (Numeric);
+
+    \draw[instanceOf] (twelve) to (Fixnum);
+    \draw[instanceOf] (pi) to (Float);
+  \end{tikzpicture}
 
 \begin{lstlisting}
-class Foo
-  @bar = 0
-  attr_accessor :bar
-  def initialize(bar)
-    @bar = bar
-  end
-  class << self
+12.class # Fixnum
+3.14.class # Float
+12.is_a? Numeric # true
+12.is_a? Integer # true
+12.is_a? Fixnum # true
+12.kind_of? Numeric # true
+12.instance_of? Numeric # false
+12.instance_of? Integer # false
+12.instance_of? Fixnum # true
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Class Variables Are Shared With Subclasses}
+
+  \begin{tikzpicture}
+    \node[detailedClass] (Parent) at (0,0) {
+      Parent
+      \nodepart{second}\texttt{@@foo}
+    };
+    \node[class] (Child) at (2,0) {Child};
+
+    \draw[subclass] (Child) to (Parent);
+
+    \node[instance] (daddy) at (-2.5,0.5) {daddy};
+    \node[instance] (mommy) at (-2.5,-0.5) {mommy};
+    \node[instance] (johnny) at (4,0.5) {johnny};
+    \node[instance] (sally) at (4,-0.5) {sally};
     
+    \draw[instanceOf] (daddy) to (Parent);
+    \draw[instanceOf] (mommy) to (Parent);
+    \draw[instanceOf] (johnny) to (Child);
+    \draw[instanceOf] (sally) to (Child);
+  \end{tikzpicture}
+
+\begin{lstlisting}
+class Parent
+  @@foo = []
+  def foo
+    @@foo
   end
+  def self.foo
+    @@foo
+  end
+end
+
+class Child < Parent
+end
+\end{lstlisting}
+\end{slide}
+
+\begin{slide}
+  \h{Class Variables Are Shared With Subclasses}
+
+\begin{lstlisting}
+daddy, mommy = Parent.new, Parent.new
+johnny, sally = Child.new, Child.new
+Parent.foo << 1
+Child.foo << 2
+daddy << 3
+johnny << 4
+Parent.foo # [1, 2, 3, 4]
+Child.foo # [1, 2, 3, 4]
+daddy.foo # [1, 2, 3, 4]
+mommy.foo # [1, 2, 3, 4]
+johnny.foo # [1, 2, 3, 4]
+sally.foo # [1, 2, 3, 4]
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Class Instance Variables Are Not Shared}
+
+\begin{lstlisting}
+class A
+  class << self
+    attr_accessor :x
+  end
+end
+class B < A
+end
+A.x = :aay
+B.x = :buzz
+A.x # :aay
+B.x # :buzz
+a = A.new
+b = B.new
+a.class.x # :aay
+b.class.x # :buzz
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Modules}
+
+  Modules can't be instantiated.
+  They're like classes, but more for libraries of functions.
+
+\begin{lstlisting}
+module MathStuff
+  BETTER_PI = 3.15
+  class << self
+    def addition x,y # I love typing
+      x+y
+    end
+    def subtraction x,y
+      x-y
+    end
+  end
+end
+
+MathStuff.addition 12,44 # 56
+m = MathStuff.new # NoMethodError: undefined method `new'
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Mixins Are Modules Stuffed Into Classes}
+
+  \begin{tikzpicture}
+    \node[module] (Person) at (0,0) {Person};
+    \node[class] (Employee) at (2.5,0) {Employee};
+    \node[class] (Manager) at (5,0) {Manager};
+    \node[class] (CEO) at (7,0) {CEO};
+    \node[class] (HumanCustomer) at (0,-1) {HumanCustomer};
+    \node[class] (Customer) at (3.25,-1) {Customer};
+    \node[class] (CorpCustomer) at (6.5,-1) {CorpCustomer};
+    \draw[mixin] (Employee) to (Person);
+    \draw[mixin] (HumanCustomer) to (Person);
+    \draw[subclass] (Manager) to (Employee);
+    \draw[subclass] (CEO) to (Manager);
+    \draw[subclass] (HumanCustomer) to (Customer);
+    \draw[subclass] (CorpCustomer) to (Customer);
+  \end{tikzpicture}
+
+\begin{lstlisting}
+module Person
+  attr_accessor :name, :age, :favorite_color
+end
+class Employee
+  include Person
+end
+class Manager < Employee
+end
+class Customer
+  include Person
 end
 \end{lstlisting}
 \end{slide}
 
 
 \begin{slide}
-  \h{Mixins}
+  \h{Singletons}
+
+  You almost never actually want one of these.
+
+\begin{lstlisting}
+require "singleton"
+
+class ThereCanBeOnlyOne
+  include Singleton
+  attr_accessor :name
+end
+
+connor = ThereCanBeOnlyOne.instance # You can't call new.
+connor.name = "Connor MacLeod"
+duncan = ThereCanBeOnlyOne.instance
+duncan.name = "Duncan MacLeod"
+connor.name # "Duncan MacLeod"
+connor == duncan # true
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Eigenclasses}
+
+\begin{lstlisting}
+class Object
+  def eigenclass
+    class << self
+      self
+    end
+  end
+end
+
+class A
+end
+
+a, b = A.new, A.new
+a.eigenclass != b.eigenclass # true
+a.eigenclass.class # Class
+a.eigenclass.superclass # A
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Instance Methods}
+
+\begin{lstlisting}
+class C
+  def initialize x
+    @x = x
+  end
+  def f
+    puts @x
+  end
+end
+
+c = C.new "default stuff"
+d = C.new "wat?"
+def d.f
+  puts @x.reverse
+end
+c.f # "default stuff"
+d.f # "?taw"
+\end{lstlisting}
+\end{slide}
+
+
+\begin{slide}
+  \h{Metaclasses}
+
+  Instance methods \textit{actually} live in the metaclass.
+
+\begin{lstlisting}
+class C
+  def initialize x
+    @x = x
+  end
+  def f
+    puts @x
+  end
+end
+c, d = C.new(13), C.new(13)
+def c.f
+  "lucky"
+end
+c.to_s # "lucky"
+d.to_s # "13"
+metaclass = class << c; self; end
+\end{lstlisting}
 \end{slide}
 
 
